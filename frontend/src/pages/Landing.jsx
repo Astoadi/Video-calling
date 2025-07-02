@@ -21,7 +21,7 @@ export default function LandingPage() {
         <div className='home_page_top w-full flex flex-col gap-4 sm:flex-row justify-between items-center mt-4 px-4'>
             <div className='home_page_left font-[450] text-3xl'>Connect Pro</div>
             {!isLoggedIn?<div className='home_page_right flex items-center gap-4'>
-                <div className='text-[1.1rem] cursor-pointer'>Join as Guest</div>
+                {/* <div className='text-[1.1rem] cursor-pointer'>Join as Guest</div> */}
                 <Link to={'/auth'}>
                     <div className='text-[1.15rem] font-[550] cursor-pointer'>Register</div>
                 </Link>
