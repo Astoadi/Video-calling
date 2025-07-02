@@ -3,10 +3,15 @@ import TextField from '@mui/material/TextField';
 import { AuthContext } from '../contexts/authContext';
 import Snackbar from '@mui/material/Snackbar';
 
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import { useNavigate } from 'react-router-dom';
+
 
 export default function AuthenticationPage() {
 
-    const{handleLogin,handleRegister} =useContext(AuthContext);
+    const{handleLogin,handleRegister,setUserData} =useContext(AuthContext);
+
+    const navigate=useNavigate();
 
     const [userName,setUserName]=useState("");
     const [fullName,setFullName]=useState("");
@@ -26,7 +31,7 @@ export default function AuthenticationPage() {
             if(isMode===0){
                 //login
                 let result=await handleLogin(userName,password);
-                console.log(result);
+                setUserData(userName);
                 setMessage("User Logged In Successfully");
                 setOpen(true);
             }
@@ -47,7 +52,9 @@ export default function AuthenticationPage() {
   return (
     <div className='auth_page h-screen flex flex-col justify-between items-center lg:flex-row'>
 
-        <div className='auth_page_left h-full w-full lg:w-[60%] bg-[url(/images/authImage.png)] bg-top-right'></div>
+        <div className='auth_page_left h-full w-full lg:w-[60%] bg-[url(/images/authImage.png)] bg-top-right'>
+        <ArrowBackIosIcon className='relative top-5 left-5 cursor-pointer' onClick={()=>navigate('/')}/>
+        </div>
 
         <div className='auth_page_right h-full w-full lg:w-[40%] flex flex-col justify-top items-center gap-4 pt-20 pb-4'>
 
