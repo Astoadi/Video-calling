@@ -1,5 +1,5 @@
 import { Badge, Button, IconButton, TextField } from '@mui/material';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { io } from "socket.io-client";
 
 import VideocamIcon from '@mui/icons-material/Videocam';
@@ -11,6 +11,7 @@ import ScreenShareIcon from '@mui/icons-material/ScreenShare';
 import StopScreenShareIcon from '@mui/icons-material/StopScreenShare';
 import ChatIcon from '@mui/icons-material/Chat';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../contexts/authContext';
 
 const server_url='http://localhost:3000';
 
@@ -34,9 +35,9 @@ export default function VideoMeetComponent() {
 
   let [audioAvailable,setAudioAvailable]=useState(true);
 
-  let [video,setVideo]=useState();
+  let [video,setVideo]=useState(true);
 
-  let [audio,setAudio]=useState();
+  let [audio,setAudio]=useState(true);
 
   let [screen,setScreen]=useState(false);
 
@@ -59,6 +60,8 @@ export default function VideoMeetComponent() {
   let [videos,setVideos]=useState([]);
 
   let router=useNavigate();
+
+  const {userData}=useContext(AuthContext);
 
   async function getPermissions(){
     try{
@@ -368,14 +371,19 @@ export default function VideoMeetComponent() {
 
   let getDisplayMedia=()=>{
     if(screen){
-      if(navigator){
-        if(navigator.mediaDevices.getDisplayMedia){
-          navigator.mediaDevices.getDisplayMedia({video:true,audio:true})
-          .then(getDisplayMediaSuccess)
-          .then((stream)=>{})
-          .catch(e=>console.log(e));
-        }
+      if(navigator?.mediaDevices?.getDisplayMedia){
+        navigator.mediaDevices.getDisplayMedia({video:true,audio:true})
+        .then(getDisplayMediaSuccess)
+        .then((stream)=>{})
+        .catch(e=>{
+          console.log(e)
+          setScreen(false);
+        })
+      }else{
+        setScreen(false);
       }
+    }else{
+      getUserMedia();
     }
   }
   
@@ -402,17 +410,48 @@ export default function VideoMeetComponent() {
     router('/home');
   }
 
+  useEffect(() => {
+    return () => {
+      socketRef.current?.disconnect();
+      Object.values(connections).forEach(conn => conn.close?.());
+      if (localVideoRef.current?.srcObject) {
+        localVideoRef.current.srcObject.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
+  
+
   return (
     <div>{
       askForUserName===true?
 
-        <div>
-            <h2>Enter into Lobby</h2>
-            <TextField label='UserName' variant='outlined' value={userName} onChange={(e)=>setUserName(e.target.value)} required/>
-            <Button variant="outlined" onClick={connect}>Connect</Button>
+        <div className='flex flex-col items-center justify-center h-screen bg-[#191b29] text-white px-4'>
+            <h2 className='text-3xl font-semibold mb-6'>Enter into Lobby</h2>
+            <div className='flex flex-col gap-2 text-white'>
+              <TextField label='UserName' variant='outlined' defaultValue={userData} value={userName} className='w-full' sx=
+              {
+                {
+                  input: { color: 'white' },
+                  label: { color: 'white' },
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: 'white',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: 'white',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: 'white',
+                    },
+                  }
+                }
+              }
+              onChange={(e)=>setUserName(e.target.value)} required/>
+              <Button variant="outlined" color='primary' disabled={!userName.trim()} className='mb-6 w-full max-w-sm' onClick={connect}>Connect</Button>
+            </div>
 
-            <div>
-              <video ref={localVideoRef} autoPlay muted/>
+            <div className="border border-gray-300 rounded-lg overflow-hidden mt-6 shadow-md">
+              <video ref={localVideoRef} autoPlay muted className='w-[320px] h-[180px] object-cover rounded-md'/>
             </div>
 
         </div>:
