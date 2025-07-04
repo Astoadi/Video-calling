@@ -13,8 +13,8 @@ import ChatIcon from '@mui/icons-material/Chat';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/authContext';
 
-const server_url='http://localhost:3000';
-
+// const server_url='http://localhost:3000';
+import server_url from '../environment.js';
 var connections={};
 
 const peerConfigConnections={

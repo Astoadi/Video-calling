@@ -7,7 +7,7 @@ let timeOnLine={};
 export const connectToSocket=(server)=>{
     const io=new Server(server,{
         cors:{
-            origin:"http://localhost:5173",
+            origin:"https://proconnect-y3e8.onrender.com",
             methods:["GET","POST"],
             credentials:true,
             allowedHeaders:['*']
